@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, orm
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from db.database import Base
 
@@ -16,5 +17,4 @@ class UserModel(Base):
     avatar = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
     category_id = Column(Integer, ForeignKey("category.id"))
-
-    category = orm.relationship("CategoryModel", back_populates="users")
+    category = relationship("CategoryModel", back_populates="users")

@@ -6,7 +6,7 @@ from models.ranking_model import Base
 from models.tournament_inscription_model import Base
 from models.tournament_model import Base
 from models.user_model import Base
-from routers import category, users
+from routers import category, tournament, tournament_inscriptions, users
 
 Base.metadata.create_all(bind=engine)
 
@@ -17,6 +17,8 @@ app = FastAPI()
 
 app.include_router(users.router)
 app.include_router(category.router)
+app.include_router(tournament.router)
+app.include_router(tournament_inscriptions.router)
 
 
 @app.get("/")

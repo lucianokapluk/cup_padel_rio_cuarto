@@ -14,6 +14,7 @@ class UserBase(BaseModel):
     last_name: str
     dni: str = Field(..., max_length=8)
     avatar: str | None
+    category_id: Optional[int] = Field(default=None, foreign_key="category.id")
 
 
 class UserCreate(UserBase):
@@ -22,7 +23,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    category: Optional[Category] = None
+    category: Category | None
 
     class Config:
         orm_mode = True
