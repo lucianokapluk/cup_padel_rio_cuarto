@@ -19,9 +19,9 @@ router = APIRouter(
 def inscribe_user(tournament_inscription: TournamentInscriptionCreate, tournament_id: int,  db: Session = Depends(get_db)):
     existing_inscriptions = get_tournament_inscriptions(db, tournament_id)
     for inscription in existing_inscriptions:
-        if inscription.first_player == tournament_inscription.first_player or inscription.first_player == tournament_inscription.second_player:
+        if inscription.first_player_id == tournament_inscription.first_player_id or inscription.first_player_id == tournament_inscription.second_player_id:
             return {"message": "User is already inscribed in the tournament"}
-        if inscription.second_player == tournament_inscription.first_player or inscription.second_player == tournament_inscription.second_player:
+        if inscription.second_player == tournament_inscription.first_player_id or inscription.second_player_id == tournament_inscription.second_player_id:
             return {"message": "User is already inscribed in the tournament"}
     inscribe_user_to_tournament(db, tournament_inscription, tournament_id)
     return {"message": "User has been inscribed to the tournament"}
