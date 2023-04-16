@@ -32,7 +32,7 @@ def get_tournament_inscriptions(db: Session, tournament_id: int) -> List[Tournam
 
 def get_tournament_inscriptions_by_user(db: Session, user_id: int) -> List[TournamentInscriptionModel]:
     inscriptions = db.query(TournamentInscriptionModel).filter(
-        TournamentInscriptionModel.first_player == user_id
+        TournamentInscriptionModel.first_player_id == user_id
     ).all()
     return inscriptions
 

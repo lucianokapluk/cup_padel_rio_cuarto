@@ -2,6 +2,7 @@ from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from db.database import Base
+from models.tournament_inscription_model import TournamentInscriptionModel
 
 
 class UserModel(Base):

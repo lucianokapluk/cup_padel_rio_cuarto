@@ -19,8 +19,3 @@ app.include_router(users.router)
 app.include_router(category.router)
 app.include_router(tournament.router)
 app.include_router(tournament_inscriptions.router)
-
-
-@app.get("/")
-async def root():
-    return "Hola mundo"

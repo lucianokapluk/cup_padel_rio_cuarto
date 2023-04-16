@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from cruds.tournament_crud import get_tournaments
 from cruds.tournament_inscription_crud import (
     expel_user_from_tournament, get_tournament_inscriptions,
     get_tournament_inscriptions_by_user, get_user_tournament_inscriptions,
@@ -42,7 +43,8 @@ def get_tournament_inscriptions_by_tournament(tournament_id: int, db: Session = 
 
 
 @router.get("/inscriptions/users/{user_id}/", response_model=List[TournamentInscription])
-def get_tournament_inscriptions_by_user(user_id: int, db: Session = Depends(get_db)):
+def get_tournament_inscriptions_by_user_id(user_id: int, db: Session = Depends(get_db)):
+
     inscriptions = get_tournament_inscriptions_by_user(db, user_id)
     if not inscriptions:
         raise HTTPException(status_code=404, detail="Inscriptions not found")
