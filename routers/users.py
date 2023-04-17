@@ -5,9 +5,9 @@ from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 
 from cruds import category_crud, user_crud
+from cruds.authentication_crud import authenticate_user, get_user_access_token
 from db.database import Base, SessionLocal, engine, get_db
 from schemas.user import User, UserCreate
-from services.jwt_auth_users import authenticate_user, get_user_access_token
 
 router = APIRouter(
     prefix="/users", tags=["users"], )

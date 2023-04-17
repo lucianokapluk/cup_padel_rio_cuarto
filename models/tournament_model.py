@@ -24,3 +24,5 @@ class TournamentModel(Base):
 
     inscriptions = relationship(
         "TournamentInscriptionModel", back_populates="tournament", foreign_keys=[TournamentInscriptionModel.tournament_id])
+
+    groups = relationship("GroupModel", back_populates="tournament")

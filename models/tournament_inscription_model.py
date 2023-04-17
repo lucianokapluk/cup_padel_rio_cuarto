@@ -15,6 +15,7 @@ class TournamentInscriptionModel(Base):
     tournament_id = Column(Integer, ForeignKey("tournament.id"))
     tournament = relationship(
         "TournamentModel", back_populates="inscriptions")
+    group_id = Column(Integer, ForeignKey("groups.id"))
 
     first_player = relationship(
         "UserModel", foreign_keys=[first_player_id], backref="first_player_inscriptions"
@@ -23,3 +24,4 @@ class TournamentInscriptionModel(Base):
     second_player = relationship(
         "UserModel", foreign_keys=[second_player_id], backref="second_player_inscriptions"
     )
+    group = relationship("GroupModel", back_populates="inscriptions")
