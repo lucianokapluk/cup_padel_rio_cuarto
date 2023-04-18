@@ -1,6 +1,6 @@
 
 
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -27,8 +27,8 @@ class TournamentUpdate(TournamentBase):
 
 class Tournament(TournamentBase):
     id: int
-    category: Category | None
-    inscriptions: List[TournamentInscription] | None
+    category: Optional[Category] = None
+    inscriptions: Optional[List[TournamentInscription]] = None
 
     class Config:
         orm_mode = True
