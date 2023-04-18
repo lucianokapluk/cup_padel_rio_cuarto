@@ -1,0 +1,20 @@
+# Ignorar archivos de caché de Python
+__pycache__/
+*.pyc
+
+# Ignorar archivos generados por el IDE
+.vscode/
+.idea/
+
+# Ignorar archivos de registro y otros archivos generados
+*.log
+*.swp
+*.swo
+
+# Ignorar archivos de configuración local
+.env
+.env.*
+*.sqlite
+
+# Ignorar archivos de dependencias de Python
+venv/
