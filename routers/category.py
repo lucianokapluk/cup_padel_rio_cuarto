@@ -1,4 +1,6 @@
 
+from typing import List
+
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
@@ -26,7 +28,7 @@ def read_category(category_id: int, db: Session = Depends(get_db)):
 # Get all categories
 
 
-@router.get("/categories/", response_model=list[Category])
+@router.get("/categories/", response_model=List[Category])
 def read_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     categories = category_crud.get_categories(db, skip=skip, limit=limit)
     return categories
