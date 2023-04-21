@@ -14,15 +14,11 @@ config_env = {
 
 SQLALCHEMY_DATABASE_URL = config_env["DATABASE_URL"]
 
-# , "postgresql://postgres:4636@localhost:5432/postgres"
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
-
-# Dependency to get database session
 
 
 def get_db():

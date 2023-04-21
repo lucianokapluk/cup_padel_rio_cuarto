@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
@@ -15,6 +14,7 @@ ACCESS_TOKEN_DURATION = 200
 SECRET = "d02b482d3e5431d9cdd63099566f3a8dcf8bc1064bfa580575773c5528ebfc59"
 
 router = APIRouter()
+blacklist = set()
 
 
 crypt = CryptContext(schemes=["bcrypt"])
@@ -50,27 +50,43 @@ def create_access_token(subject: str) -> str:
 
 def decode_access_token(token: str) -> Optional[str]:
     try:
+
         payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
         return payload["sub"]
     except JWTError:
         return None
 
 
-async def verify_token(authorization: str = Header(..., scheme="Bearer")):
+def invalidate_token(token: str):
+    blacklist.add(token)
+
+
+def is_token_revoked(token: str) -> bool:
+    return token in blacklist
+
+
+async def verify_token(authorization: str = Header(..., scheme="Bearer", include_in_schema=False)):
     try:
         token = authorization.split(" ")[1]
+        if is_token_revoked(token):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="sdad token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
         payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token",
+                detail="Invalasid token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
+            detail="Invalasid token",
             headers={"WWW-Authenticate": "Bearer"},
         )
 

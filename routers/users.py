@@ -3,11 +3,12 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import HTTPBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from cruds import category_crud, user_crud
-from cruds.authentication_crud import authenticate_user, get_user_access_token
+from cruds.authentication_crud import (authenticate_user,
+                                       get_user_access_token, verify_token)
 from db.database import Base, SessionLocal, engine, get_db
 from schemas.user import User, UserCreate
 
@@ -15,8 +16,6 @@ router = APIRouter(
     prefix="/users", tags=["users"], )
 
 security_scheme = HTTPBearer()
-
-Base.metadata.create_all(bind=engine)
 
 
 @router.post("/", response_model=User, status_code=201)
@@ -28,12 +27,14 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), token=Depends(security_scheme), user: dict = Depends(verify_token),
+               ):
+
     users = user_crud.get_users(db, skip=skip, limit=limit)
     return users
 
 
-@router.get("/{user_id}", response_model=User)
+@ router.get("/{user_id}", response_model=User)
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = user_crud.get_user(db, user_id=user_id)
     if db_user is None:
@@ -41,19 +42,10 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 
-@router.post("/login/")
-def login_for_access_token(dni: str, password: str, db: Session = Depends(get_db)):
-    user = authenticate_user(db, dni, password)
-    if not user:
-        raise HTTPException(
-            status_code=401, detail="Invalid dni or password")
-    access_token = get_user_access_token(user)
-    return {"access_token": access_token, "token_type": "bearer"}
-
 # Assign a category to a user
 
 
-@router.post("/users/{user_id}/categories", response_model=User)
+@ router.post("/users/{user_id}/categories", response_model=User)
 def assign_category_to_user(user_id: int, category_id: int, db: Session = Depends(get_db)):
     db_user = user_crud.get_user(db, user_id=user_id)
     if db_user is None:

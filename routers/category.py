@@ -10,7 +10,7 @@ from db.database import SessionLocal, engine, get_db
 from schemas.category import Category, CategoryCreate, CategoryUpdate
 
 security_scheme = HTTPBearer()
-"""  """
+
 router = APIRouter(
     prefix="/category", tags=["categories"])
 
