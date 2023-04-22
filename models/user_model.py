@@ -1,8 +1,16 @@
+from enum import Enum
+
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from db.database import Base
 from models.tournament_inscription_model import TournamentInscriptionModel
+
+
+class Role(str, Enum):
+    admin = "admin"
+    staff = "staff"
+    player = "player"
 
 
 class UserModel(Base):
@@ -18,4 +26,5 @@ class UserModel(Base):
     avatar = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
     category_id = Column(Integer, ForeignKey("category.id"))
+    role = Column(String, default=Role.player)
     category = relationship("CategoryModel", back_populates="users")

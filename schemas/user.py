@@ -4,6 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from models.user_model import Role
 from schemas.category import Category
 
 
@@ -15,6 +16,7 @@ class UserBase(BaseModel):
     dni: str = Field(..., max_length=8)
     avatar: Optional[str] = None
     category_id: Optional[int] = Field(default=None, foreign_key="category.id")
+    role: str = Field(default=Role.player)
 
 
 class UserCreate(UserBase):

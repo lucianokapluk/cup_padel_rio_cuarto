@@ -7,7 +7,10 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from requests import Session
 
+from cruds.user_crud import get_user
+from db.database import get_db
 from models.user_model import UserModel
+from schemas.user import User
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_DURATION = 200
@@ -83,6 +86,7 @@ async def verify_token(authorization: str = Header(..., scheme="Bearer", include
                 detail="Invalasid token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -91,3 +95,39 @@ async def verify_token(authorization: str = Header(..., scheme="Bearer", include
         )
 
     return username
+
+
+async def verify_token_only_admin(db: Session = Depends(get_db), authorization: str = Header(..., scheme="Bearer", include_in_schema=False)):
+    try:
+        token = authorization.split(" ")[1]
+        if is_token_revoked(token):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="sdad token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalasid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        user: User | None = get_user(db, username)
+        if user.id != 2:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Forbidden authorization",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        print(user.id)
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalasid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return user
