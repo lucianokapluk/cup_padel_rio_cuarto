@@ -16,8 +16,7 @@ from schemas.user import User, UserCreate
 
 security_scheme = HTTPBearer()
 router = APIRouter(
-    prefix="/users", tags=["users"])
-(""" , dependencies=[Depends(security_scheme), Depends(verify_token)] """)
+    prefix="/users", tags=["users"], dependencies=[Depends(security_scheme), Depends(verify_token)])
 
 
 @router.post("/", response_model=User, status_code=201)
