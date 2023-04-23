@@ -1,7 +1,7 @@
 
 
 from functools import wraps
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -28,11 +28,20 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return user_crud.create_user(db=db, user=user)
 
 
-@router.get("/", response_model=List[User], )
-def get_users(skip: int = 0, limit: int = 100,  db: Session = Depends(get_db),
-              ):
+@router.get("/", response_model=List[User])
+def get_users(
+    skip: int = 0,
+    limit: int = 100,
+    category_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
 
-    users = user_crud.get_users(db, skip=skip, limit=limit)
+    if category_id is not None:
+        users = user_crud.get_users_by_category(
+            db, category_id, skip=skip, limit=limit)
+    else:
+        users = user_crud.get_users(db, skip=skip, limit=limit)
+
     return users
 
 

@@ -36,6 +36,10 @@ def delete_user(db: Session, user_id: int):
     return False
 
 
+def get_users_by_category(db: Session, category_id: int, skip: int = 0, limit: int = 100):
+    return db.query(UserModel).filter(UserModel.category_id == category_id).offset(skip).limit(limit).all()
+
+
 def patch_user(db: Session, user_id: int, user_data: user.UserUpdate):
     db_user = get_user(db, user_id)
     if db_user:
