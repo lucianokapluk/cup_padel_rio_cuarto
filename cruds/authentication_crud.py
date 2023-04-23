@@ -9,7 +9,7 @@ from requests import Session
 
 from cruds.user_crud import get_user
 from db.database import get_db
-from models.user_model import UserModel
+from models.user_model import Role, UserModel
 from schemas.user import User
 
 ALGORITHM = "HS256"
@@ -116,13 +116,13 @@ async def verify_token_only_admin(db: Session = Depends(get_db), authorization: 
                 headers={"WWW-Authenticate": "Bearer"},
             )
         user: User | None = get_user(db, username)
-        if user.id != 2:
+        if user.role != Role.admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Forbidden authorization",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        print(user.id)
+
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

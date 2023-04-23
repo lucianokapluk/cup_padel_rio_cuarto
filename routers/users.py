@@ -16,7 +16,8 @@ from schemas.user import User, UserCreate
 
 security_scheme = HTTPBearer()
 router = APIRouter(
-    prefix="/users", tags=["users"], dependencies=[Depends(security_scheme), Depends(verify_token)])
+    prefix="/users", tags=["users"])
+""" , dependencies=[Depends(security_scheme), Depends(verify_token)] """
 
 
 @router.post("/", response_model=User, status_code=201)
@@ -35,7 +36,10 @@ def read_users(skip: int = 0, limit: int = 100,  db: Session = Depends(get_db),
     return users
 
 
-@router.get("/{user_id}", response_model=User, dependencies=[Depends(verify_token_only_admin)])
+""" dependencies=[Depends(verify_token_only_admin)] """
+
+
+@router.get("/{user_id}", response_model=User)
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = user_crud.get_user(db, user_id)
     if db_user is None:
