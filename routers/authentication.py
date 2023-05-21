@@ -2,6 +2,7 @@
 import jwt
 from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.security import HTTPBearer
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from cruds.authentication_crud import (authenticate_user,
@@ -14,9 +15,14 @@ router = APIRouter(
 security_scheme = HTTPBearer()
 
 
+class LoginRequest(BaseModel):
+    dni: str
+    password: str
+
+
 @router.post("/login/")
-def login_for_access_token(dni: str, password: str, db: Session = Depends(get_db)):
-    user = authenticate_user(db, dni, password)
+def login_for_access_token(login_body: LoginRequest, db: Session = Depends(get_db)):
+    user = authenticate_user(db, login_body.dni, login_body.password)
     if not user:
         raise HTTPException(
             status_code=401, detail="Invalid dni or password")
