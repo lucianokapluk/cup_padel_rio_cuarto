@@ -64,3 +64,14 @@ async def get_groups_by_tournament_id(tournament_id: int, db: Session = Depends(
                            })
 
     return groups
+
+
+@router.delete("/group/{group_id}")
+async def delete_group(group_id: int, db: Session = Depends(get_db)):
+    group = db.query(GroupModel).filter_by(id=group_id).first()
+    if group:
+        db.delete(group)
+        db.commit()
+        return {"message": "Group deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Group not found")
