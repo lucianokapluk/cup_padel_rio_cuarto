@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
@@ -34,9 +35,10 @@ async def assign_inscription(group_id: int, inscription_id: int, db: Session = D
 
 @router.get("/group/{group_id}", response_model=GroupWithInscriptions)
 async def get_group_with_inscriptions(group_id: int, db: Session = Depends(get_db)):
-    group = db.query(GroupModel).filter_by(id=group_id).first()
+    group: GroupModel = db.query(GroupModel).filter_by(id=group_id).first()
     if group:
-        inscriptions = group.inscriptions
+        inscriptions = sorted(
+            group.inscriptions, key=lambda x: (x.position, x.updated_at))
         return {"group": group, "inscriptions": inscriptions}
     else:
         return {"message": "Group not found"}
@@ -75,3 +77,18 @@ async def delete_group(group_id: int, db: Session = Depends(get_db)):
         return {"message": "Group deleted successfully"}
     else:
         raise HTTPException(status_code=404, detail="Group not found")
+
+
+@router.put("/group/inscriptions/{inscription_id}")
+def update_inscription(inscription_id: int, position: int, db: Session = Depends(get_db)):
+    inscription = db.query(TournamentInscriptionModel).filter(
+        TournamentInscriptionModel.id == inscription_id).first()
+
+    if inscription:
+        inscription.position = position
+        inscription.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(inscription)
+        return {"message": "Inscription updated successfully"}
+
+    return {"message": "Inscription not found"}

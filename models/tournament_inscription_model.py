@@ -1,3 +1,6 @@
+import datetime
+
+from click import DateTime
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
@@ -13,10 +16,11 @@ class TournamentInscriptionModel(Base):
     second_player_id = Column(Integer, ForeignKey("users.id"))
     rate_date_time = Column(String)
     tournament_id = Column(Integer, ForeignKey("tournament.id"))
+    position = Column(Integer)
     tournament = relationship(
         "TournamentModel", back_populates="inscriptions")
     group_id = Column(Integer, ForeignKey("groups.id"))
-
+    updated_at = Column(String)
     first_player = relationship(
         "UserModel", foreign_keys=[first_player_id], backref="first_player_inscriptions"
     )
