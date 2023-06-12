@@ -19,7 +19,7 @@ class TournamentInscriptionModel(Base):
     position = Column(Integer)
     tournament = relationship(
         "TournamentModel", back_populates="inscriptions")
-    group_id = Column(Integer, ForeignKey("groups.id"))
+    group_id = Column(Integer, ForeignKey("groups.id"), nullable=True)
     updated_at = Column(String)
     first_player = relationship(
         "UserModel", foreign_keys=[first_player_id], backref="first_player_inscriptions"

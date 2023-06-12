@@ -13,6 +13,7 @@ class TournamentInscriptionBase(BaseModel):
     position: int | None
     updated_at: str | None
     rate_date_time: str
+    group_id: int | None
 
 
 class TournamentInscriptionCreate(TournamentInscriptionBase):

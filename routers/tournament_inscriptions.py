@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -9,6 +9,7 @@ from cruds.tournament_inscription_crud import (
     get_tournament_inscriptions_by_user, get_user_tournament_inscriptions,
     inscribe_user_to_tournament)
 from db.database import get_db
+from models.tournament_inscription_model import TournamentInscriptionModel
 from schemas.tournament_inscription import (TournamentInscription,
                                             TournamentInscriptionCreate)
 
@@ -37,9 +38,12 @@ def expel_user(user_id: int, tournament_id: int, db: Session = Depends(get_db)):
 @router.get("/inscriptions/{tournament_id}/", response_model=List[TournamentInscription])
 def get_tournament_inscriptions_by_tournament(tournament_id: int, db: Session = Depends(get_db)):
     inscriptions = get_tournament_inscriptions(db, tournament_id)
-    if not inscriptions:
-        raise HTTPException(status_code=404, detail="Inscriptions not found")
-    return inscriptions
+    filtered_inscriptions = [
+        inscription for inscription in inscriptions if inscription.group_id is None]
+    if not filtered_inscriptions:
+        raise HTTPException(
+            status_code=404, detail="Inscriptions without group_id not found")
+    return filtered_inscriptions
 
 
 @router.get("/inscriptions/users/{user_id}/", response_model=List[TournamentInscription])
@@ -57,3 +61,34 @@ def get_user_tournament_inscriptions(db: Session = Depends(get_db)):
     if not inscriptions:
         raise HTTPException(status_code=404, detail="Inscriptions not found")
     return inscriptions
+
+
+@router.put("/inscriptions/{inscription_id}/group_id", response_model=TournamentInscription)
+def update_tournament_inscription_group_id_endpoint(
+    inscription_id: int, db: Session = Depends(get_db)
+):
+    inscription = get_tournament_inscription(db, inscription_id)
+    if not inscription:
+        raise HTTPException(status_code=404, detail="Inscription not found")
+
+    updated_inscription = update_tournament_inscription_group_id(
+        db, inscription_id)
+    return updated_inscription
+
+
+def get_tournament_inscription(db: Session, inscription_id: int) -> TournamentInscription:
+    return db.query(TournamentInscriptionModel).filter(TournamentInscriptionModel.id == inscription_id).first()
+
+
+def update_tournament_inscription_group_id(
+    db: Session, inscription_id: int
+) -> TournamentInscription:
+    inscription = get_tournament_inscription(db, inscription_id)
+    if not inscription:
+        return None
+
+    inscription.group_id = None
+    inscription.position = None
+    db.commit()
+    db.refresh(inscription)
+    return inscription
